@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ProfPal – Simple Clickable Prototype</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#fff; --border:#e6e8ee;
+    --text:#0f172a; --muted:#6b7280; --accent:#0b5cff; --ok:#16a34a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto;color:var(--text);background:var(--bg)}
+  .wrap{max-width:860px;margin:32px auto;padding:0 16px}
+  h1{font-size:28px;margin:0 0 12px}
+  h2{font-size:22px;margin:8px 0 12px}
+  h3{font-size:18px;margin:0 0 10px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin:16px 0}
+  .row{display:flex;gap:12px}
+  .row > *{flex:1}
+  .btn{appearance:none;border:1px solid var(--border);background:#fff;border-radius:12px;padding:12px 16px;cursor:pointer}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn.ghost{background:#fff}
+  .btn.block{width:100%}
+  .btn[disabled]{opacity:.6;cursor:not-allowed}
+  input,textarea,select{
+    width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#fff
+  }
+  .muted{color:var(--muted)}
+  .pill{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:6px 10px;background:#fff}
+  .tabs{display:flex;gap:8px;margin:10px 0}
+  .tab{padding:10px 14px;border:1px solid var(--border);border-radius:999px;background:#fff;cursor:pointer}
+  .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .hide{display:none}
+  .divider{height:1px;background:var(--border);margin:12px 0}
+  .badge{display:inline-block;border:1px dashed var(--border);padding:6px 10px;border-radius:10px;color:var(--muted)}
+  .item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--border)}
+  .item:first-child{border-top:0}
+  .ok{color:var(--ok)}
+  .section-title{font-weight:800;margin:24px 0 10px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:720px){.row,.grid2{flex-direction:column;display:block}}
+  header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);z-index:10}
+  header .wrap{display:flex;gap:10px;align-items:center}
+  nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  nav a{color:#111;text-decoration:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <strong>ProfPal</strong>
+    <nav>
+      <a href="#s1">Login</a>
+      <a href="#s2">Prof Connection</a>
+      <a href="#s3">Student Networking</a>
+      <a href="#s4">Profile</a>
+      <a href="#s5">Community</a>
+      <a href="#s6">Professor Settings</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- 1) LOGIN -->
+  <section id="s1" class="card">
+    <h2>1) Login — User Authentication</h2>
+    <div class="row">
+      <div>
+        <label>College Email <span class="pill">.edu only</span>
+          <input id="email" placeholder="Enter college email" />
+        </label>
+      </div>
+      <div>
+        <label>Password
+          <input id="pass" type="password" placeholder="Enter password" />
+        </label>
+      </div>
+    </div>
+    <button id="loginBtn" class="btn block">Login with College Credentials</button>
+    <p class="muted">Use your university email (e.g., name@college.edu).</p>
+    <p id="loginMsg" class="muted"></p>
+  </section>
+
+  <!-- 2) STUDENT–PROFESSOR CONNECTION -->
+  <section id="s2" class="card">
+    <h2>2) Student–Professor Connection</h2>
+    <input id="searchProf" placeholder="Search professors by name or department" />
+    <div class="tabs">
+      <button class="tab active" data-tab="prof">Professors</button>
+      <button class="tab" data-tab="stud">Students</button>
+      <button class="tab" data-tab="req">Requests</button>
+    </div>
+
+    <div id="tab-prof">
+      <div class="grid2">
+        <div class="card">
+          <h3>Professor List</h3>
+          <div id="profList"></div>
+        </div>
+        <div class="card">
+          <h3>Send Request</h3>
+          <div class="badge" id="selectedProf">No professor selected</div>
+          <div class="divider"></div>
+          <p class="muted">Add a note… <span class="pill">required</span></p>
+          <textarea id="note" rows="4" placeholder="Explain why you want to connect…"></textarea>
+          <div class="row">
+            <button id="sendReq" class="btn primary" disabled>Confirm Send</button>
+            <button id="clearSel" class="btn ghost">Clear</button>
+          </div>
+          <p id="sendMsg" class="ok"></p>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-stud" class="hide">
+      <h3>Students</h3>
+      <div id="studentList"></div>
+    </div>
+
+    <div id="tab-req" class="hide">
+      <h3>Your Requests</h3>
+      <div id="reqList"></div>
+    </div>
+  </section>
+
+  <!-- 3) STUDENT–STUDENT -->
+  <section id="s3" class="card">
+    <h2>3) Student–Student Networking</h2>
+    <input id="searchStudent" placeholder="Search students by name or department" />
+    <div id="studentList2"></div>
+  </section>
+
+  <!-- 4) PROFILE -->
+  <section id="s4" class="card">
+    <h2>4) Profile — Bio Management</h2>
+    <div class="card">
+      <div class="row">
+        <div>
+          <label>Name
+            <input id="pName" placeholder="Your name" />
+          </label>
+        </div>
+        <div>
+          <label>Department • Role
+            <input id="pDept" placeholder="e.g., CS • Student" />
+          </label>
+        </div>
+      </div>
+      <div style="margin-top:8px">
+        <label>Bio <span class="pill">Required for conversation starters</span>
+          <textarea id="pBio" rows="3" placeholder="Write a brief bio about your interests, projects, and goals..."></textarea>
+        </label>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button id="saveProfile" class="btn primary">Save</button>
+        <button id="clearProfile" class="btn ghost">Clear</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Preview</h3>
+      <p><strong id="pvName">Name</strong></p>
+      <p class="muted" id="pvDept">Department • Role</p>
+      <p id="pvBio" class="muted">Your bio will appear here.</p>
+    </div>
+  </section>
+
+  <!-- 5) COMMUNITY -->
+  <section id="s5" class="card">
+    <h2>5) Community — Post Sharing</h2>
+    <textarea id="postText" placeholder="Share something…"></textarea>
+    <button id="postBtn" class="btn block" style="margin-top:8px">Post</button>
+    <div id="feed"></div>
+  </section>
+
+  <!-- 6) PROFESSOR SETTINGS -->
+  <section id="s6" class="card">
+    <h2>6) Professor Settings — Meeting Preferences</h2>
+    <div class="card">
+      <h3>Meeting Preference</h3>
+      <label><input type="radio" name="mode" value="online"> Online</label><br />
+      <label><input type="radio" name="mode" value="in-person"> In-person</label>
+      <div class="divider"></div>
+      <h3>Meeting Type</h3>
+      <label><input type="radio" name="type" value="individual"> Individual</label><br />
+      <label><input type="radio" name="type" value="group"> Group</label>
+      <div class="row" style="margin-top:8px">
+        <button id="saveSettings" class="btn primary">Save</button>
+        <button id="resetSettings" class="btn ghost">Cancel</button>
+      </div>
+      <p class="muted" id="settingsPreview"></p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ========= Demo data ========= */
+const PROFS = [
+  { id:'p1', name:'Professor Name (Lin)', dept:'Mechanical Eng' },
+  { id:'p2', name:'Professor Name (Kapoor)', dept:'Computer Science' },
+  { id:'p3', name:'Professor Name (Alvarez)', dept:'Design' },
+];
+const STUDENTS = [
+  { id:'s1', name:'Student Name (Aisha)', dept:'ECE' },
+  { id:'s2', name:'Student Name (Miguel)', dept:'Design' },
+  { id:'s3', name:'Student Name (Priya)', dept:'CS' },
+  { id:'s4', name:'Student Name (Noah)', dept:'Biology' },
+];
+
+const state = {
+  user:null, // {email, name, dept, bio}
+  selectedProf:null,
+  requests:[],  // {to, note, at}
+  peers:[],     // connected student ids
+  posts:[],     // {id,text,likes,comments[]}
+  settings:{mode:'online',type:'individual'}
+};
+
+/* ========= Helpers ========= */
+const $ = (s,root=document)=>root.querySelector(s);
+function el(tag, html){ const e=document.createElement(tag); e.innerHTML=html; return e; }
+function save(){ localStorage.setItem('profpal', JSON.stringify(state)); }
+function load(){
+  const s = localStorage.getItem('profpal'); if(s) Object.assign(state, JSON.parse(s));
+}
+load();
+
+/* ========= 1) Login ========= */
+$('#loginBtn').onclick = ()=>{
+  const email = $('#email').value.trim().toLowerCase();
+  const pass = $('#pass').value.trim();
+  const msg = $('#loginMsg');
+  msg.textContent = '';
+  if(!email.endsWith('.edu')) { msg.textContent = 'Please use a .edu email.'; return; }
+  if(pass.length < 4)        { msg.textContent = 'Password too short.'; return; }
+  state.user = state.user || {email, name:'', dept:'', bio:''};
+  state.user.email = email;
+  save();
+  msg.textContent = 'Logged in ✓';
+  msg.classList.add('ok');
+};
+
+/* ========= Tabs for #s2 ========= */
+const tabs = Array.from(document.querySelectorAll('.tab'));
+tabs.forEach(t=>{
+  t.addEventListener('click',()=>{
+    tabs.forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    ['prof','stud','req'].forEach(id=>$('#tab-'+id).classList.add('hide'));
+    $('#tab-'+t.dataset.tab).classList.remove('hide');
+  });
+});
+
+/* ========= Professor list + request ========= */
+function drawProfList(filter=''){
+  const box = $('#profList'); box.innerHTML='';
+  PROFS.filter(p=>(p.name+p.dept).toLowerCase().includes(filter))
+    .forEach(p=>{
+      const li = el('div', `
+        <div class="item">
+          <div><strong>${p.name}</strong><div class="muted">${p.dept}</div></div>
+          <button class="btn">Select</button>
+        </div>
+      `);
+      li.querySelector('button').onclick = ()=>{
+        state.selectedProf = p;
+        $('#selectedProf').textContent = `${p.name} • ${p.dept}`;
+        $('#sendReq').disabled = false;
+      };
+      box.append(li);
+    });
+}
+drawProfList();
+$('#searchProf').addEventListener('input', e=>drawProfList(e.target.value.toLowerCase()));
+
+$('#clearSel').onclick = ()=>{
+  state.selectedProf=null; $('#selectedProf').textContent='No professor selected';
+  $('#sendReq').disabled=true; $('#note').value=''; $('#sendMsg').textContent='';
+};
+
+$('#sendReq').onclick = ()=>{
+  if(!state.user || !state.user.bio){ alert('Add your bio in Profile first.'); return; }
+  const note = $('#note').value.trim();
+  if(!state.selectedProf){ alert('Select a professor.'); return; }
+  if(!note){ alert('Please add a note.'); return; }
+  state.requests.push({to:state.selectedProf.name, note, at:new Date().toLocaleString()});
+  save();
+  $('#sendMsg').textContent='Request sent!';
+  $('#note').value=''; $('#sendReq').disabled=true; $('#selectedProf').textContent='No professor selected';
+  renderRequests();
+};
+
+function renderRequests(){
+  const box = $('#reqList'); if(!box) return;
+  box.innerHTML='';
+  state.requests.slice().reverse().forEach(r=>{
+    box.append(el('div', `<div class="item"><div><strong>To:</strong> ${r.to}<div class="muted">${r.at}</div><div class="muted">Note: ${r.note}</div></div></div>`));
+  });
+}
+renderRequests();
+
+/* ========= Student lists (connect) ========= */
+function drawStudentLists(filter=''){
+  const fill = (id)=>{
+    const box = $(id); box.innerHTML='';
+    STUDENTS.filter(s=>(s.name+s.dept).toLowerCase().includes(filter))
+      .forEach(s=>{
+        const connected = state.peers.includes(s.id);
+        const li = el('div', `
+          <div class="item">
+            <div><strong>${s.name}</strong><div class="muted">${s.dept}</div></div>
+            <button class="btn ${connected?'':'primary'}">${connected?'Connected':'Connect'}</button>
+          </div>
+        `);
+        const btn = li.querySelector('button');
+        btn.onclick = ()=>{
+          if(!state.peers.includes(s.id)) state.peers.push(s.id);
+          save(); drawStudentLists(filter);
+        };
+        box.append(li);
+      });
+  };
+  fill('#studentList');
+  fill('#studentList2');
+}
+drawStudentLists();
+$('#searchStudent').addEventListener('input', e=>drawStudentLists(e.target.value.toLowerCase()));
+
+/* ========= 4) Profile ========= */
+function refreshProfilePreview(){
+  $('#pvName').textContent = state.user?.name || 'Name';
+  $('#pvDept').textContent = state.user?.dept || 'Department • Role';
+  $('#pvBio').textContent  = state.user?.bio  || 'Your bio will appear here.';
+}
+refreshProfilePreview();
+
+$('#saveProfile').onclick = ()=>{
+  state.user = state.user || {email:'',name:'',dept:'',bio:''};
+  state.user.name = $('#pName').value.trim();
+  state.user.dept = $('#pDept').value.trim();
+  state.user.bio  = $('#pBio').value.trim();
+  if(!state.user.bio){ alert('Bio is required.'); return; }
+  save(); refreshProfilePreview();
+};
+$('#clearProfile').onclick = ()=>{
+  $('#pName').value=''; $('#pDept').value=''; $('#pBio').value='';
+};
+
+/* ========= 5) Community ========= */
+function drawFeed(){
+  const box = $('#feed'); box.innerHTML='';
+  state.posts.slice().reverse().forEach(post=>{
+    const li = el('div', `
+      <div class="card">
+        <div class="muted">${new Date(post.at).toLocaleString()}</div>
+        <p>${post.text}</p>
+        <div class="row">
+          <button class="btn" data-like>Like (${post.likes})</button>
+          <button class="btn" data-comment>Comment</button>
+        </div>
+        <div class="divider"></div>
+        <div class="muted">${post.comments.length} comment(s)</div>
+      </div>
+    `);
+    li.querySelector('[data-like]').onclick = ()=>{
+      post.likes++; save(); drawFeed();
+    };
+    li.querySelector('[data-comment]').onclick = ()=>{
+      const msg = prompt('Write a comment:');
+      if(msg){ post.comments.push({msg,at:Date.now()}); save(); drawFeed(); }
+    };
+    box.append(li);
+  });
+}
+$('#postBtn').onclick = ()=>{
+  const t = $('#postText').value.trim(); if(!t) return;
+  state.posts.push({id:crypto.randomUUID(), text:t, likes:0, comments:[], at:Date.now()});
+  $('#postText').value=''; save(); drawFeed();
+};
+drawFeed();
+
+/* ========= 6) Professor Settings ========= */
+function applySettingsToForm(){
+  document.querySelectorAll('input[name="mode"]').forEach(r=>r.checked = r.value===state.settings.mode);
+  document.querySelectorAll('input[name="type"]').forEach(r=>r.checked = r.value===state.settings.type);
+  $('#settingsPreview').textContent = `Current: ${state.settings.mode} • ${state.settings.type}`;
+}
+applySettingsToForm();
+
+$('#saveSettings').onclick = ()=>{
+  const mode = document.querySelector('input[name="mode"]:checked')?.value || 'online';
+  const type = document.querySelector('input[name="type"]:checked')?.value || 'individual';
+  state.settings = {mode, type}; save(); applySettingsToForm();
+};
+$('#resetSettings').onclick = applySettingsToForm;
+</script>
+</body>
+</html>
